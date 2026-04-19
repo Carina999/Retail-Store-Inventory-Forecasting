@@ -293,10 +293,10 @@ with c1:
     fig_cat.add_bar(x=cat_agg['category'], y=cat_agg['actual'],    name='Actual',    marker_color='#2c3e50')
     fig_cat.add_bar(x=cat_agg['category'], y=cat_agg['predicted'], name='Predicted', marker_color='#3498db', opacity=0.8)
     fig_cat.update_layout(
-        title=dict(text='Total units by category', font=dict(size=13)),
+        title=dict(text='Total units by category', font=dict(size=13), y=0.97, yanchor='top'),
         barmode='group', height=280,
-        margin=dict(l=0, r=0, t=36, b=0),
-        legend=dict(orientation='h', yanchor='bottom', y=1.02),
+        margin=dict(l=0, r=0, t=60, b=0),
+        legend=dict(orientation='h', yanchor='bottom', y=1.08),
         plot_bgcolor='white', paper_bgcolor='white',
         xaxis=dict(showgrid=False),
         yaxis=dict(gridcolor='#f3f4f6'),
@@ -313,10 +313,10 @@ with c2:
     fig_reg.add_bar(x=region_agg['region'], y=region_agg['actual'],    name='Actual',    marker_color='#2c3e50')
     fig_reg.add_bar(x=region_agg['region'], y=region_agg['predicted'], name='Predicted', marker_color='#3498db', opacity=0.8)
     fig_reg.update_layout(
-        title=dict(text='Total units by region', font=dict(size=13)),
+        title=dict(text='Total units by region', font=dict(size=13), y=0.97, yanchor='top'),
         barmode='group', height=280,
-        margin=dict(l=0, r=0, t=36, b=0),
-        legend=dict(orientation='h', yanchor='bottom', y=1.02),
+        margin=dict(l=0, r=0, t=60, b=0),
+        legend=dict(orientation='h', yanchor='bottom', y=1.08),
         plot_bgcolor='white', paper_bgcolor='white',
         xaxis=dict(showgrid=False),
         yaxis=dict(gridcolor='#f3f4f6'),
