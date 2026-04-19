@@ -444,7 +444,7 @@ with col_table:
             'alert':         'Status',
         })
         .style
-        .applymap(style_alert, subset=['Status'])
+        .map(style_alert, subset=['Status'])
         .format({'Stock (units)': '{:,.0f}', 'Daily forecast': '{:.1f}', 'Days of supply': '{:.1f}'})
     )
     st.dataframe(styled, use_container_width=True, height=220)
