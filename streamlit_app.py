@@ -211,10 +211,17 @@ st.markdown(
 daily = df.groupby('obs_date').agg(
     actual    =('actual_units',    'sum'),
     predicted =('predicted_units', 'sum'),
-    lower     =('predicted_lower', 'sum'),
-    upper     =('predicted_upper', 'sum'),
     abs_error =('abs_error',       'sum'),
 ).reset_index()
+
+# CI computed at daily-aggregated level from daily residuals.
+# Summing per-record lower/upper would over-inflate the band by ~sqrt(n).
+# Instead: residual = actual_daily - predicted_daily, take 10th/90th percentile.
+daily['residual'] = daily['actual'] - daily['predicted']
+ci_lo = float(np.percentile(daily['residual'], 10))
+ci_hi = float(np.percentile(daily['residual'], 90))
+daily['lower'] = (daily['predicted'] + ci_lo).clip(lower=0)
+daily['upper'] = (daily['predicted'] + ci_hi).clip(lower=0)
 
 total_actual    = daily['actual'].sum()
 total_predicted = daily['predicted'].sum()
