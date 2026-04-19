@@ -70,6 +70,7 @@ def load_predictions() -> pd.DataFrame:
             p.predicted_lower,
             p.predicted_upper,
             p.abs_error,
+            a.inventory_level,
             a.price,
             a.discount,
             a.is_promo
@@ -358,16 +359,23 @@ latest_date.columns = ['store_id', 'product_id', 'latest_date']
 df_latest = df.merge(latest_date, on=['store_id', 'product_id'])
 df_latest = df_latest[df_latest['obs_date'] == df_latest['latest_date']].copy()
 
-# Aggregate to SKU level (sum over the filtered date)
-sku_agg = df.groupby(['store_id', 'product_id', 'category', 'region']).agg(
-    total_actual    =('actual_units',    'sum'),
-    total_predicted =('predicted_units', 'sum'),
-    avg_predicted   =('predicted_units', 'mean'),
-).reset_index()
+# Use latest inventory_level per SKU (snapshot on the most recent date)
+latest_inv = (
+    df.sort_values('obs_date')
+    .groupby(['store_id', 'product_id', 'category', 'region'])
+    .agg(
+        inventory_level =('inventory_level', 'last'),   # most recent stock level
+        avg_predicted   =('predicted_units', 'mean'),   # avg daily forecast demand
+        total_actual    =('actual_units',    'sum'),
+        total_predicted =('predicted_units', 'sum'),
+    )
+    .reset_index()
+)
+sku_agg = latest_inv.copy()
 
-# Days of supply: total_actual / avg daily predicted demand
+# Days of supply: actual inventory / avg daily predicted demand
 sku_agg['days_of_supply'] = (
-    sku_agg['total_actual'] / sku_agg['avg_predicted'].replace(0, np.nan)
+    sku_agg['inventory_level'] / sku_agg['avg_predicted'].replace(0, np.nan)
 ).round(1)
 
 # Alert level
@@ -438,21 +446,21 @@ with col_table:
     styled = (
         display_df[[
             'store_id', 'product_id', 'category', 'region',
-            'total_actual', 'avg_predicted', 'days_of_supply', 'alert'
+            'inventory_level', 'avg_predicted', 'days_of_supply', 'alert'
         ]]
         .rename(columns={
-            'store_id':      'Store',
-            'product_id':    'Product',
-            'category':      'Category',
-            'region':        'Region',
-            'total_actual':  'Stock (units)',
-            'avg_predicted': 'Daily forecast',
-            'days_of_supply':'Days of supply',
-            'alert':         'Status',
+            'store_id':        'Store',
+            'product_id':      'Product',
+            'category':        'Category',
+            'region':          'Region',
+            'inventory_level': 'Stock on hand',
+            'avg_predicted':   'Daily forecast',
+            'days_of_supply':  'Days of supply',
+            'alert':           'Status',
         })
         .style
         .map(style_alert, subset=['Status'])
-        .format({'Stock (units)': '{:,.0f}', 'Daily forecast': '{:.1f}', 'Days of supply': '{:.1f}'})
+        .format({'Stock on hand': '{:,.0f}', 'Daily forecast': '{:.1f}', 'Days of supply': '{:.1f}'})
     )
     st.dataframe(styled, use_container_width=True, height=220)
 
