@@ -175,5 +175,5 @@ The Streamlit app always queries `WHERE run_timestamp = (SELECT MAX(run_timestam
 
 ## Dataset
 
-[Retail Store Inventory Forecasting Dataset](https://www.kaggle.com/datasets/retail-store-inventory-forecasting-dataset) — Kaggle, 2024.  
+[Retail Store Inventory Forecasting Dataset](https://www.kaggle.com/datasets/anirudhchauhan/retail-store-inventory-forecasting-dataset) — Kaggle, 2024.  
 73,100 rows · 15 columns · 5 stores · 20 products · 2 years (2022–2023)
